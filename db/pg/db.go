@@ -72,12 +72,21 @@ func (c pgCreator) Create(p *properties.Properties) (ycsb.DB, error) {
 	port := p.GetInt(pgPort, 5432)
 	user := p.GetString(pgUser, "root")
 	password := p.GetString(pgPassword, "")
+	if(password == "") {
+		password = "\"\""
+	}
 	dbName := p.GetString(pgDBName, "test")
 	sslMode := p.GetString(pdSSLMode, "disable")
+	// fmt.Println("!!!!"+dbName+"\t",port)
 
-	dsn := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=%s", user, password, host, port, dbName, sslMode)
+	// psqlUrl := "postgresql://root@192.168.50.3:26256/ycsbtest?sslmode=disable"
+	// dsn := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=%s", user, password, host, port, dbName, sslMode)
+	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
+    	"password=%s dbname=%s sslmode=%s",
+    	host, port, user, password, dbName, sslMode)
+	fmt.Println(psqlInfo)
 	var err error
-	db, err := sql.Open("postgres", dsn)
+	db, err := sql.Open("postgres", psqlInfo)
 	if err != nil {
 		fmt.Printf("open pg failed %v", err)
 		return nil, err
